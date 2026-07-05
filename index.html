@@ -1,431 +1,203 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manohar — builder</title>
+<meta name="description" content="Software engineer shipping products that earn a place in people's days.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:    #151119;   /* warm near-black canvas */
+    --bone:   #ECE5DA;   /* warm off-white text */
+    --dim:    #938A82;   /* muted warm grey */
+    --amber:  #E9A23B;   /* signature accent */
+    --line:   #2A2431;   /* hairlines */
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
+  body {
+    background: var(--ink);
+    color: var(--bone);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100svh;
+    min-width: 0;              /* don't let wide flex content stretch the page */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-x: hidden;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Ambient warmth: a low glow that anchors the statement, plus faint grain. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(60% 55% at 22% 32%, rgba(233,162,59,0.10), transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
 
-  <title>Manohar</title>
-  <meta content="" name="descriptison">
-  <meta content="" name="keywords">
+  main {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 1080px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 7rem 2rem 2rem;
+  }
 
-  <!-- Favicons -->
-  <link href="assets/img/favicon1.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 2.2rem;
+  }
+  .eyebrow b { color: var(--bone); font-weight: 500; }
 
-  <!-- Google Fonts -->
-  <link
-    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-    rel="stylesheet">
+  h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2.15rem, 7.2vw, 6rem);
+    line-height: 1.03;
+    letter-spacing: -0.015em;
+    max-width: 16ch;
+    text-wrap: balance;
+    overflow-wrap: break-word;
+  }
+  h1 em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--amber);
+  }
 
-  <!-- Vendor CSS Files -->
-  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
-  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-  <link href="assets/vendor/venobox/venobox.css" rel="stylesheet">
-  <link href="assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
-  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  .lede {
+    margin-top: 2rem;
+    font-size: clamp(1.02rem, 1.9vw, 1.2rem);
+    color: var(--dim);
+    max-width: 46ch;
+  }
+  .lede b { color: var(--bone); font-weight: 500; }
 
+  /* Signature: a live "now building" status line — the maker's terminal voice. */
+  .status {
+    margin-top: 3.4rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    max-width: 100%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.86rem;
+    color: var(--dim);
+    padding: 0.7rem 1.1rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    align-self: flex-start;
+  }
+  .status .dot {
+    flex: none;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--amber);
+    box-shadow: 0 0 0 0 rgba(233,162,59,0.55);
+    animation: pulse 2.4s ease-out infinite;
+  }
+  .status span { min-width: 0; overflow-wrap: anywhere; }
+  .status b { color: var(--bone); font-weight: 500; }
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(233,162,59,0.5); }
+    70%  { box-shadow: 0 0 0 9px rgba(233,162,59,0); }
+    100% { box-shadow: 0 0 0 0 rgba(233,162,59,0); }
+  }
 
-  <link href="assets/css/style.css" rel="stylesheet">
+  footer {
+    position: relative;
+    z-index: 1;
+    max-width: 1080px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
+    letter-spacing: 0.04em;
+    color: var(--dim);
+    border-top: 1px solid var(--line);
+  }
+  footer a {
+    color: var(--dim);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  footer a:hover, footer a:focus-visible { color: var(--amber); }
+  footer nav { display: flex; gap: 1.6rem; }
 
+  /* Orchestrated load: statement rises first, then supporting lines follow. */
+  .rise { opacity: 0; transform: translateY(14px); animation: rise 0.9s cubic-bezier(0.2,0.7,0.2,1) forwards; }
+  .d1 { animation-delay: 0.05s; }
+  .d2 { animation-delay: 0.22s; }
+  .d3 { animation-delay: 0.38s; }
+  .d4 { animation-delay: 0.54s; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
 
+  @media (prefers-reduced-motion: reduce) {
+    .rise { opacity: 1; transform: none; animation: none; }
+    .status .dot { animation: none; }
+  }
+
+  @media (max-width: 560px) {
+    main { padding: 5rem 1.4rem 1.5rem; }
+    .eyebrow { letter-spacing: 0.28em; font-size: 0.7rem; margin-bottom: 1.6rem; }
+    h1 { max-width: none; }
+    .lede { max-width: none; }
+    .status { font-size: 0.72rem; gap: 0.55rem; padding: 0.65rem 0.9rem; }
+    footer { padding: 1.4rem; font-size: 0.7rem; }
+    footer nav { gap: 1.2rem; }
+  }
+</style>
 </head>
-
 <body>
-
-  <!-- ======= Header ======= -->
-  <header id="header">
-    <div class="d-flex flex-column">
-
-      <div class="profile">
-        <img src="assets/img/profile-img.jpg" alt="" class="img-fluid rounded-circle">
-        <h1 class="text-light"><a href="index.html">Manohar</a></h1>
-        <div class="social-links mt-3 text-center">
-
-          <a href="https://www.facebook.com/profile.php?id=100007661085049" class="facebook"><i
-              class="bx bxl-facebook"></i></a>
-          <a href="https://www.instagram.com/__m_a_n_u.__/?hl=en" class="instagram"><i class="bx bxl-instagram"></i></a>
-
-          <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
-        </div>
-      </div>
-
-      <nav class="nav-menu">
-        <ul>
-          <li class="active"><a href="index.html"><i class="bx bx-home"></i> <span>Home</span></a></li>
-          <li><a href="#about"><i class="bx bx-user"></i> <span>About</span></a></li>
-          <li><a href="#resume"><i class="bx bx-file-blank"></i> <span>Resume</span></a></li>
-          <li><a href="#portfolio"><i class="bx bx-book-content"></i>Projects</a></li>
-          <li><a href="#services"><i class="bx bx-server"></i> Services</a></li>
-          <li><a href="#contact"><i class="bx bx-envelope"></i> Contact</a></li>
-
-        </ul>
-      </nav><!-- .nav-menu -->
-      <button type="button" class="mobile-nav-toggle d-xl-none"><i class="icofont-navigation-menu"></i></button>
-
+  <main>
+    <p class="eyebrow rise d1"><b>Manohar</b> &nbsp;·&nbsp; software, shipped</p>
+    <h1 class="rise d2">I'd rather <em>build</em> the thing than talk about it.</h1>
+    <p class="lede rise d3">
+      Software engineer making things people fold into their day. I design and ship
+      <b>real products</b>, and I'm always heads-down on the next one.
+    </p>
+    <div class="status rise d4">
+      <span class="dot"></span>
+      <span>now building &nbsp;<b>FORM</b>&nbsp; — a daily grooming tracker</span>
     </div>
-  </header><!-- End Header -->
-
-  <!-- ======= Hero Section ======= -->
-  <section id="hero" class="d-flex flex-column justify-content-center align-items-center">
-    <div class="hero-container" data-aos="fade-in">
-      <h1 style="font-family:monospace;color:rgba(0, 0, 0, 0.726);letter-spacing:1px">Manohar</h1>
-      <p>I'm <span class="typed" data-typed-items="Programmer,  Developer, Freelancer,Designer "></span></p>
-    </div>
-  </section><!-- End Hero -->
-
-  <main id="main">
-
-    <!-- ======= About Section ======= -->
-    <section id="about" class="about">
-      <div class="container">
-
-        <div class="section-title">
-          <h2>About</h2>
-          <span style="font-size: 20px; font-weight: 400;">Hi, I am Manohar, I am a web developer & programmer from
-            Bangalore, India. <br> <br> <span style="font-weight: 400; font-size: 20px;">I enjoy building everything
-              from
-              small business sites to rich interactive web apps.
-
-              If you are business seeking a web presence or an employer looking to hire, you can get in touch with
-              me <a href="#contact">here</a></span>
-          </span>
-          <br>
-          <br>
-        </div>
-
-        <div class="row ">
-          <div class="col-lg-4" data-aos="fade-right">
-            <img class='profile-pic' src="assets/img/profile-pic-1.jpg" class="img-fluid" alt=""
-              style="border-radius: 50%;">
-
-          </div>
-          <div class="col-lg-8 pt-4 pt-lg-0 content" data-aos="fade-left">
-            <h3>Programmer &amp; Web Developer.</h3>
-            <br>
-            <div class="row">
-              <div class="col-lg-6">
-                <ul class="info">
-                  <li><i class="icofont-rounded-right"></i> <strong>Birthday:</strong> 27 Dec 1999</li>
-                  <li><i class="icofont-rounded-right"></i> <strong>Website:</strong><a
-                      href='index.html'>manoharys.github.io</a></li>
-                  <li><i class="icofont-rounded-right"></i> <strong>Phone:</strong> +91 7892737478</li>
-                  <li><i class="icofont-rounded-right"></i> <strong>City:</strong> Bangalore, India</li>
-                </ul>
-              </div>
-              <div class="col-lg-6">
-                <ul class="info">
-                  <li><i class="icofont-rounded-right"></i> <strong>Age:</strong> 20</li>
-                  <li><i class="icofont-rounded-right"></i> <strong>Degree:</strong> B-Tech</li>
-                  <li><i class="icofont-rounded-right"></i> <strong>Email:</strong> manumanohar1527@gmail.com</li>
-                  <li><i class="icofont-rounded-right"></i> <strong>Freelance:</strong> Available</li>
-                </ul>
-              </div>
-            </div>
-            <p class="info">
-              <q> Fear should guide you, but it should be latent. I have some latent fear. I consider failure on a
-                regular basis.</q><br>
-              <p id="quoteName">- BILL GATES</p>
-            </p>
-          </div>
-        </div>
-
-      </div>
-    </section>
-    <section id="skills" class="skills section-bg">
-      <div class="container">
-
-        <div class="section-title">
-          <h2>Skills</h2>
-          <p>Work-Experience </p>
-        </div>
-
-        <div class="row skills-content">
-
-          <div class="col-lg-6" data-aos="fade-up">
-
-            <div class="progress">
-              <span class="skill">HTML <i class="val">90%</i></span>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
-                </div>
-              </div>
-            </div>
-
-            <div class="progress">
-              <span class="skill">CSS <i class="val">90%</i></span>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar" role="progressbar" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">
-                </div>
-              </div>
-            </div>
-
-            <div class="progress">
-              <span class="skill">JavaScript <i class="val">85%</i></span>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar" role="progressbar" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
-
-            <div class="progress">
-              <span class="skill">C <i class="val">80%</i></span>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">
-                </div>
-              </div>
-            </div>
-
-            <div class="progress">
-              <span class="skill">Java <i class="val">70%</i></span>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar" role="progressbar" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100">
-                </div>
-              </div>
-            </div>
-
-            <div class="progress">
-              <span class="skill">PHP <i class="val">75%</i></span>
-              <div class="progress-bar-wrap">
-                <div class="progress-bar" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-    </section><!-- End Skills Section -->
-
-    <!-- ======= Resume Section ======= -->
-    <section id="resume" class="resume">
-      <div class="container">
-
-        <div class="section-title">
-          <h2>Resume</h2>
-        </div>
-
-
-        <div class="button_cont"><a class="example_f" href="manohar_resume.pdf" target="_blank"
-            rel="nofollow"><span>View Resume</a></div>
-
-
-      </div>
-    </section><!-- End Resume Section -->
-
-    <!-- ======= Portfolio Section ======= -->
-    <section id="portfolio" class="portfolio section-bg">
-      <div class="container">
-
-        <div class="section-title">
-          <h2>Projects</h2>
-
-        </div>
-
-        <div class="row" data-aos="fade-up">
-          <div class="col-lg-12 d-flex justify-content-center">
-            <ul id="portfolio-flters">
-              <li data-filter="*" class="filter-active">Selected Projects</li>
-
-
-            </ul>
-          </div>
-        </div>
-
-        <div class="row portfolio-container" data-aos="fade-up" data-aos-delay="100">
-
-          <div class="col-lg-4 col-md-4 portfolio-item filter-app" title="VideoTube">
-            <h5 align="center">VideoTube</h5>
-
-            <div class="portfolio-wrap">
-              <img src="assets/img/portfolio/videoTube.jpg" class="img-fluid" alt="" style="height: 270px;">
-              <div class="portfolio-links">
-                <a href="assets/img/portfolio/videoTube.jpg" data-gall="portfolioGallery" class="venobox"
-                  title="App 1"><i class="bx bx-plus"></i></a>
-                <a href="https://github.com/manoharys/VideoTube" title="More Details"><i class="bx bx-link"></i></a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-web" title="Connector">
-            <h5 align="center">Connector</h5>
-            <div class="portfolio-wrap">
-              <img src="assets/img/portfolio/connector.png" class="img-fluid" alt="" style="height: 270px;">
-              <div class="portfolio-links">
-                <a href="assets/img/portfolio/connector.png" data-gall="portfolioGallery" class="venobox"
-                  title="Web 3"><i class="bx bx-plus"></i></a>
-                <a href="https://github.com/manoharys/Connector" title="More Details"><i class="bx bx-link"></i></a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-app" title="Flying-Bird">
-            <h5 align="center">Flying-Bird</h5>
-            <div class="portfolio-wrap">
-              <img src="assets/img/portfolio/flying-bird.jpg" class="img-fluid" alt=""
-                style="width:325px; height: 270px;">
-              <div class="portfolio-links">
-                <a href="assets/img/portfolio/flying-bird.jpg" data-gall="portfolioGallery" class="venobox"
-                  title="App 2"><i class="bx bx-plus"></i></a>
-                <a href="https://github.com/manoharys/Flying-Bird-Vanilla-JS" title="More Details"><i
-                    class="bx bx-link"></i></a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-card" title="Car-Game">
-            <h5 align="center">Car-Game</h5>
-            <div class="portfolio-wrap">
-              <img src="assets/img/portfolio/car-game.JPG" class="img-fluid" alt="" style="height: 270px;">
-              <div class="portfolio-links">
-                <a href="assets/img/portfolio/car-game.JPG" data-gall="portfolioGallery" class="venobox"
-                  title="Card 2"><i class="bx bx-plus"></i></a>
-                <a href="https://github.com/manoharys/Car-Game" title="More Details"><i class="bx bx-link"></i></a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-web">
-            <h5 align="center">COVID19-tracker</h5>
-            <div class="portfolio-wrap">
-              <img src="assets/img/portfolio/covid.jpg" class="img-fluid" alt="" style="height: 270px;">
-              <div class="portfolio-links">
-                <a href="assets/img/portfolio/covid.jpg" data-gall="portfolioGallery" class="venobox" title="Web 2"><i
-                    class="bx bx-plus"></i></a>
-                <a href="https://github.com/manoharys/COVID19-tracker" title="More Details"><i
-                    class="bx bx-link"></i></a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6 portfolio-item filter-app">
-            <h5 align="center">Plane-Bomber</h5>
-            <div class="portfolio-wrap">
-              <img src="assets/img/portfolio/alien-invader.JPG" class="img-fluid" alt="" style="height: 270px;">
-              <div class="portfolio-links">
-                <a href="assets/img/portfolio/alien-invader.JPG" data-gall="portfolioGallery" class="venobox"
-                  title="App 3"><i class="bx bx-plus"></i></a>
-                <a href="https://github.com/manoharys/Plane-Bomber" title="More Details"><i class="bx bx-link"></i></a>
-              </div>
-            </div>
-          </div>
-
-
-
-
-
-
-        </div>
-
-      </div>
-    </section><!-- End Portfolio Section -->
-
-    <!-- ======= Services Section ======= -->
-    <section id="services" class="services">
-      <div class="container">
-
-        <div class="section-title">
-          <h2>Services</h2>
-
-        </div>
-
-        <div class="row">
-          <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up">
-            <div class="icon"><i class="icofont-computer"></i></div>
-            <h4 class="title"><a href="">Backend-development</a></h4>
-            <p class="description">Web back-end is the invisible backbone that connects and interconnects various parts
-              of a software application.</p>
-          </div>
-          <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up" data-aos-delay="100">
-            <div class="icon"><i class="icofont-chart-bar-graph"></i></div>
-            <h4 class="title"><a href="">Frontend-development</a></h4>
-            <p class="description">Attractive, interactive & visually appealing web front-end pages are crucial for the
-              success of a business.</p>
-          </div>
-          <div class="col-lg-4 col-md-6 icon-box" data-aos="fade-up" data-aos-delay="200">
-            <div class="icon"><i class="icofont-earth"></i></div>
-            <h4 class="title"><a href="">Mobile Apps Development </a></h4>
-            <p class="description">Today mobile apps are revolutionizing the tech world, getting an easy to use, user
-              friendly & highly dynamic mobile app is extremely important.</p>
-          </div>
-
-        </div>
-
-      </div>
-    </section><!-- End Services Section -->
-
-    <!-- ======= Contact Section ======= -->
-    <section id="contact" class="contact">
-      <div class="container">
-
-        <div class="section-title">
-          <h2>Contact</h2>
-
-        </div>
-
-        <div class="row" data-aos="fade-in">
-
-          <div class="col-lg-5 d-flex align-items-stretch">
-            <div class="info">
-
-              <div class="email">
-                <i class="icofont-envelope"></i>
-                <h4>Email:</h4>
-                <p>manumanohar1527@gmail.com</p>
-              </div>
-
-              <div class="phone">
-                <i class="icofont-phone"></i>
-                <h4>Call:</h4>
-                <p>+91 7892737478</p>
-              </div>
-
-            </div>
-
-          </div>
-
-
-        </div>
-
-      </div>
-    </section><!-- End Contact Section -->
-
-  </main><!-- End #main -->
-
-  <!-- ======= Footer ======= -->
-  <footer id="footer">
-    <div class="container">
-      <div class="copyright">
-        &copy; Copyright <strong><span>All rights reserved</span></strong>
-      </div>
-    </div>
-  </footer><!-- End  Footer -->
-
-  <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
-
-  <!-- Vendor JS Files -->
-  <script src="assets/vendor/jquery/jquery.min.js"></script>
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/jquery.easing/jquery.easing.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
-  <script src="assets/vendor/waypoints/jquery.waypoints.min.js"></script>
-  <script src="assets/vendor/counterup/counterup.min.js"></script>
-  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-  <script src="assets/vendor/venobox/venobox.min.js"></script>
-  <script src="assets/vendor/owl.carousel/owl.carousel.min.js"></script>
-  <script src="assets/vendor/typed.js/typed.min.js"></script>
-  <script src="assets/vendor/aos/aos.js"></script>
-
-  <!-- Template Main JS File -->
-  <script src="assets/js/main.js"></script>
-
+  </main>
+
+  <footer>
+    <span>© 2026 Manohar</span>
+    <nav>
+      <a href="https://github.com/manoharys">GitHub</a>
+      <a href="mailto:manumanohar1527@gmail.com">Email</a>
+    </nav>
+  </footer>
 </body>
-
 </html>
