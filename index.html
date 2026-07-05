@@ -134,6 +134,16 @@
   footer nav { display: flex; gap: 1.8rem; }
   footer a { color: var(--mid); text-decoration: none; transition: color 0.18s ease; }
   footer a:hover, footer a:focus-visible { color: var(--fg); }
+
+  .fade { opacity: 0; animation: fade 0.7s ease forwards; }
+  .fade.s1 { animation-delay: 0.02s; }
+  .fade.s2 { animation-delay: 0.12s; }
+  .fade.s3 { animation-delay: 0.22s; }
+  @keyframes fade { to { opacity: 1; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fade { opacity: 1; animation: none; }
+  }
 </style>
 </head>
 <body>
