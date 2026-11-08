@@ -1,0 +1,4 @@
+# app-ads.txt for BlockFair (https://iabtechlab.com/ads-txt/)
+# Replace pub-3879868782950151 with the AdMob publisher id (AdMob → Settings → Account information).
+# Keep the fourth field exactly as written: it is Google's certification authority id.
+google.com, pub-3879868782950151, DIRECT, f08c47fec0942fa0
