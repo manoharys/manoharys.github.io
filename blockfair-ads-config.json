@@ -1,0 +1,9 @@
+{
+  "v": 1,
+  "enabled": true,
+  "maxAdContentRating": "PG",
+  "appOpen": { "enabled": true, "minSession": 2, "coldStartWindowMs": 4000, "onForegroundAfterMin": null, "cooldownMin": 240 },
+  "interstitial": { "enabled": true, "minSession": 2, "minGames": 3, "intervalSec": 180, "minGameOversBetween": 2, "perSession": 6, "perDay": 20, "afterRewardedSec": 90 },
+  "rewarded": { "enabled": true },
+  "banner": { "enabled": true, "screens": ["gameOver", "pause", "journeyResult", "dailyDone"] }
+}
